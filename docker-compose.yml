@@ -22,3 +22,62 @@ services:
       # Se precisar de SSH real, descomenta:
       # - ~/.ssh:/root/.ssh:ro
     entrypoint: ["ansible-playbook"]
+
+  superset-db:
+    image: postgres:15
+    container_name: superset-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: superset
+      POSTGRES_USER: superset
+      POSTGRES_PASSWORD: superset
+    volumes:
+      - ../superset/datafile/db:/var/lib/postgresql/data
+    networks:
+      - superset-net
+
+  superset-redis:
+    image: redis:7
+    container_name: superset-redis
+    restart: unless-stopped
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    volumes:
+      - ../superset/datafile/redis:/data
+    networks:
+      - superset-net
+
+  superset:
+    image: apache/superset:latest
+    container_name: superset
+    restart: unless-stopped
+    depends_on:
+      - superset-db
+      - superset-redis
+    environment:
+      SUPERSET_ENV: production
+      SUPERSET_LOAD_EXAMPLES: "no"
+      SUPERSET_SECRET_KEY: "CHAVE_SECRETA"
+
+      SUPERSET_DATABASE_URI: postgresql+psycopg2://superset:superset@superset-db:5432/superset
+
+      REDIS_HOST: superset-redis
+      REDIS_PORT: 6379
+      REDIS_CELERY_DB: 0
+      REDIS_RESULTS_DB: 1
+
+      SUPERSET_ADMIN_USERNAME: admin
+      SUPERSET_ADMIN_FIRSTNAME: Admin
+      SUPERSET_ADMIN_LASTNAME: Superset
+      SUPERSET_ADMIN_EMAIL: admin@example.com
+      SUPERSET_ADMIN_PASSWORD: admin123  # troca isso depois
+
+    volumes:
+      - ../superset/datafile/home:/app/superset_home
+    ports:
+      - "8088:8088"
+    networks:
+      - superset-net
+
+networks:
+  superset-net:
+    driver: bridge
