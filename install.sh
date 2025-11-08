@@ -128,36 +128,38 @@ EOF
 # ------------------------------------------------------------
 # Pipelines
 # ------------------------------------------------------------
-cat > $BASE_DIR/pipelines/run.sh <<'EOF'
+cat > /opt/devops/pipelines/run.sh <<'EOF'
 #!/bin/bash
 set -e
 
 BASE_DIR="/opt/devops"
 DOCKER_DIR="$BASE_DIR/docker"
+COMPOSE_DEVOPS="$DOCKER_DIR/docker-compose.devops.yml"
 
 echo "🚀 Executando pipeline de automação..."
 
 cd "$DOCKER_DIR"
 
 echo "🏗️ Build das imagens (terraform e ansible)..."
-docker compose build
+docker compose -f "$COMPOSE_DEVOPS" build
 
-echo "🏗️ Rodando Terraform init..."
-docker compose run --rm terraform init
+echo "🏗️ Rodando Terraform init (reconfigure)..."
+docker compose -f "$COMPOSE_DEVOPS" run --rm terraform init -reconfigure
 
 echo "📜 Rodando Terraform plan..."
-docker compose run --rm terraform plan
+docker compose -f "$COMPOSE_DEVOPS" run --rm terraform plan
 
 echo "✅ Aplicando Terraform..."
-docker compose run --rm terraform apply -auto-approve
+docker compose -f "$COMPOSE_DEVOPS" run --rm terraform apply -auto-approve
 
 echo "⚙️ Rodando Ansible Playbook..."
-docker compose run --rm ansible playbook.yml -i /ansible/inventory/hosts.ini
+docker compose -f "$COMPOSE_DEVOPS" run --rm ansible playbook.yml -i /ansible/inventory/hosts.ini
 
 echo "🎉 Pipeline concluído com sucesso!"
 EOF
 
-chmod +x $BASE_DIR/pipelines/run.sh
+chmod +x /opt/devops/pipelines/run.sh
+
 
 # ------------------------------------------------------------
 # Finalização

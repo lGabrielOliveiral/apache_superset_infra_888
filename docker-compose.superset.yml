@@ -1,28 +1,4 @@
 services:
-  terraform:
-    build:
-      context: ../terraform
-    working_dir: /workspace
-    volumes:
-      # Código Terraform dentro do container
-      - ../terraform:/workspace
-      # State e arquivos persistentes
-      - ../terraform/datafile:/datafile
-    entrypoint: ["terraform"]
-
-  ansible:
-    build:
-      context: ../ansible
-    working_dir: /ansible
-    volumes:
-      # Playbooks, inventory etc.
-      - ../ansible:/ansible
-      # Artefatos persistentes (logs, outputs, etc.)
-      - ../ansible/datafile:/datafile
-      # Se precisar de SSH real, descomenta:
-      # - ~/.ssh:/root/.ssh:ro
-    entrypoint: ["ansible-playbook"]
-
   superset-db:
     image: postgres:15
     container_name: superset-db
