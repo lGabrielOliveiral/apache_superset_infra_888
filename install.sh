@@ -26,6 +26,7 @@ wait 1s
 # desinstalando versões antigas
 for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove $pkg; done
 
+sudo apt-get install tree -y
 # Add Docker's official GPG key:
 sudo apt-get update
 sudo apt-get install ca-certificates curl
@@ -42,7 +43,7 @@ echo \
 sudo apt-get update -y
 
 # Install Docker Engine, containerd, and Docker Compose.
-sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin 
 sudo docker run hello-world
 
 
@@ -53,7 +54,7 @@ sudo docker run hello-world
 # ============================================================
 
 echo "📁 Criando estrutura base em: $BASE_DIR"
-mkdir -p $BASE_DIR/{terraform,ansible/inventory,pipelines}
+mkdir -p $BASE_DIR/{terraform/datafile,ansible/{inventory,datafile},pipelines,docker}
 
 # ------------------------------------------------------------
 # Terraform
@@ -126,10 +127,17 @@ EOF
 # ------------------------------------------------------------
 cat > $BASE_DIR/pipelines/run.sh <<'EOF'
 #!/bin/bash
-# Pipeline runner script example
+set -e
+
+BASE_DIR="/opt/devops"
+DOCKER_DIR="$BASE_DIR/docker"
 
 echo "🚀 Executando pipeline de automação..."
-cd /opt/devops/terraform
+
+cd "$DOCKER_DIR"
+
+echo "🏗️ Build das imagens (terraform e ansible)..."
+docker compose build
 
 echo "🏗️ Rodando Terraform init..."
 docker compose run --rm terraform init
@@ -141,8 +149,7 @@ echo "✅ Aplicando Terraform..."
 docker compose run --rm terraform apply -auto-approve
 
 echo "⚙️ Rodando Ansible Playbook..."
-cd /opt/devops/ansible
-docker compose run --rm ansible playbook.yml -i inventory/hosts.ini
+docker compose run --rm ansible playbook.yml -i /ansible/inventory/hosts.ini
 
 echo "🎉 Pipeline concluído com sucesso!"
 EOF
@@ -154,6 +161,8 @@ chmod +x $BASE_DIR/pipelines/run.sh
 # ------------------------------------------------------------
 echo "✅ Estrutura criada com sucesso!"
 tree $BASE_DIR || ls -R $BASE_DIR
+
+echo "digite '$BASE_DIR/pipelines/run.sh' para executar o pipeline de automação."
 
 
 
