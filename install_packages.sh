@@ -22,7 +22,6 @@ BASE_DIR="/opt/devops"
 # https://docs.docker.com/engine/install/ubuntu/
 
 echo "Iniciando instalação do Docker..."
-wait 1s
 # desinstalando versões antigas
 for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove $pkg; done
 

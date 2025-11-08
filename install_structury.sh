@@ -26,8 +26,8 @@ mkdir -p $BASE_DIR/superset/datafile/{db,redis,home}
 mkdir -p $BASE_DIR/pipelines
 
 
-cp ./docker-compose.yml $BASE_DIR/docker/docker-compose.devops.yml
-cp ./docker-compose.yml $BASE_DIR/docker/docker-compose.superset.yml
+cp ./docker-compose.devops.yml $BASE_DIR/docker/docker-compose.devops.yml
+cp ./docker-compose.superset.yml $BASE_DIR/docker/docker-compose.superset.yml
 # ------------------------------------------------------------
 # Terraform
 # ------------------------------------------------------------
