@@ -75,9 +75,6 @@ terraform {
       version = "~> 2.5"
     }
   }
-  backend "local" {
-    path = "./state/terraform.tfstate"
-  }
 }
 
 provider "local" {}
@@ -92,7 +89,7 @@ cat > $BASE_DIR/terraform/backend.tf <<'EOF'
 # Backend configuration (local by default)
 terraform {
   backend "local" {
-    path = "./state/terraform.tfstate"
+    path = "/datafile/terraform.tfstate"
   }
 }
 EOF
