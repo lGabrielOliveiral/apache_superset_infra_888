@@ -54,7 +54,13 @@ sudo docker run hello-world
 # ============================================================
 
 echo "📁 Criando estrutura base em: $BASE_DIR"
-mkdir -p $BASE_DIR/{terraform/datafile,ansible/{inventory,datafile},pipelines,docker}
+mkdir -p $BASE_DIR/ansible/{inventory,datafile}
+mkdir -p $BASE_DIR/docker
+mkdir -p $BASE_DIR/terraform/datafile
+mkdir -p $BASE_DIR/superset/datafile/{db,redis,home}
+mkdir -p $BASE_DIR/pipelines
+
+
 cp ./docker-compose.yml $BASE_DIR/docker/docker-compose.yml
 # ------------------------------------------------------------
 # Terraform
